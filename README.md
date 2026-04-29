@@ -7,6 +7,17 @@
 
 An automated GitHub repository backup tool that mirrors all repositories from a user account to a local filesystem. It ensures complete off-site backups by maintaining full git mirrors, including all branches, tags, and commit history.
 
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Restoring from Backup](#restoring-from-backup)
+- [Configuration](#configuration)
+- [License](#license)
+
 ## Features
 
 - **Automated Mirroring**: Uses `git clone --mirror` to capture all repository data and references.
@@ -66,10 +77,6 @@ Run the backup process with settings from `.env`:
 ```bash
 make backup
 ```
-Override configuration:
-```bash
-make backup DIR="./custom_dir" TOKEN="ghp_alternative_token"
-```
 
 ### 2. Direct Execution (Make-free)
 Pass variables via positional arguments:
@@ -80,6 +87,17 @@ Example:
 ```bash
 ./make.sh "./backups" "ghp_your_token_here"
 ```
+
+
+## Restoring from Backup
+
+The backed-up repositories are stored as **Git mirrors** (bare repositories). To use a backed-up repository as a working directory, you should clone it from its local path.
+
+### How to use a local mirror:
+```bash
+git clone /path/to/backup/repo_name.git
+```
+This will create a standard Git repository with a working directory from your local mirror.
 
 
 ## Configuration
