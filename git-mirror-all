@@ -7,7 +7,7 @@ if [[ -f .env ]]; then
 fi
 
 # Override variables with positional arguments if provided
-# Usage: ./make.sh [BACKUP_DIR] [GITHUB_TOKEN]
+# Usage: ./git-mirror-all [BACKUP_DIR] [GITHUB_TOKEN]
 BACKUP_DIR="${1:-${BACKUP_DIR:-.}}"
 GITHUB_TOKEN="${2:-$GITHUB_TOKEN}"
 

@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 .PHONY: help setup backup check
 
 backup: ## Run the backup script
-	./make.sh
+	./git-mirror-all
 
 setup: check ## Create .env file from .env.example
 	@if [ ! -f .env ]; then \

@@ -1,4 +1,4 @@
-# git-backup
+# git-mirror-all
 
 ![GitHub](https://img.shields.io/badge/GitHub-API-blue?logo=github)
 ![Bash](https://img.shields.io/badge/Script-Bash-4EAA25?logo=gnu-bash&logoColor=white)
@@ -38,7 +38,7 @@ An automated GitHub repository backup tool that mirrors all repositories from a 
 
 ## Project Structure
 
-- `make.sh`: The core shell script containing logic for API interaction and repository synchronization.
+- `git-mirror-all`: The core shell script containing logic for API interaction and repository synchronization.
 - `Makefile`: A professional wrapper for managing dependencies, configuration, and execution.
 - `.env.example`: Template for environment configuration.
 - `.gitignore`: Configured to exclude system files, local backups, and sensitive credentials.
@@ -81,11 +81,11 @@ make backup
 ### 2. Direct Execution (Make-free)
 Pass variables via positional arguments:
 ```bash
-./make.sh [BACKUP_DIR] [GITHUB_TOKEN]
+./git-mirror-all [BACKUP_DIR] [GITHUB_TOKEN]
 ```
 Example:
 ```bash
-./make.sh "./backups" "ghp_your_token_here"
+./git-mirror-all "./backups" "ghp_your_token_here"
 ```
 
 
