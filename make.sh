@@ -7,16 +7,15 @@ if [[ -f .env ]]; then
 fi
 
 # Override variables with positional arguments if provided
-# Usage: ./make.sh [BACKUP_DIR] [GITHUB_USERNAME] [GITHUB_TOKEN]
+# Usage: ./make.sh [BACKUP_DIR] [GITHUB_TOKEN]
 BACKUP_DIR="${1:-${BACKUP_DIR:-.}}"
-GITHUB_USERNAME="${2:-$GITHUB_USERNAME}"
-GITHUB_TOKEN="${3:-$GITHUB_TOKEN}"
+GITHUB_TOKEN="${2:-$GITHUB_TOKEN}"
 
 # Ensure required variables are set
-if [[ -z "$GITHUB_USERNAME" || -z "$GITHUB_TOKEN" ]]; then
-  echo "Error: GITHUB_USERNAME and GITHUB_TOKEN are required."
-  echo "Usage: $0 [BACKUP_DIR] [GITHUB_USERNAME] [GITHUB_TOKEN]"
-  echo "Alternatively, set them in the .env file."
+if [[ -z "$GITHUB_TOKEN" ]]; then
+  echo "Error: GITHUB_TOKEN is required."
+  echo "Usage: $0 [BACKUP_DIR] [GITHUB_TOKEN]"
+  echo "Alternatively, set it in the .env file."
   exit 1
 fi
 
@@ -26,7 +25,7 @@ mkdir -p "$BACKUP_DIR"
 page=1
 
 while :; do
-  echo "--- Fetching page $page for $GITHUB_USERNAME ---"
+  echo "--- Fetching page $page ---"
 
   repos=$(curl -s -L --connect-timeout 10 --max-time 30 \
     -H "Accept: application/vnd.github+json" \

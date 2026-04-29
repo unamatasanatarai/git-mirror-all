@@ -54,7 +54,7 @@ make setup
 #### Option B: Manual Setup
 ```bash
 cp .env.example .env
-# Edit .env and provide your GITHUB_TOKEN, GITHUB_USERNAME, and BACKUP_DIR
+# Edit .env and provide your GITHUB_TOKEN and BACKUP_DIR
 ```
 
 ## Usage
@@ -68,17 +68,17 @@ make backup
 ```
 Override configuration:
 ```bash
-make backup DIR="./custom_dir" USER="alt_user" TOKEN="ghp_alternative_token"
+make backup DIR="./custom_dir" TOKEN="ghp_alternative_token"
 ```
 
 ### 2. Direct Execution (Make-free)
 Pass variables via positional arguments:
 ```bash
-./make.sh [BACKUP_DIR] [GITHUB_USERNAME] [GITHUB_TOKEN]
+./make.sh [BACKUP_DIR] [GITHUB_TOKEN]
 ```
 Example:
 ```bash
-./make.sh "./backups" "myuser" "ghp_your_token_here"
+./make.sh "./backups" "ghp_your_token_here"
 ```
 
 
@@ -87,7 +87,6 @@ Example:
 | Variable | Description |
 | :--- | :--- |
 | `GITHUB_TOKEN` | GitHub Personal Access Token (requires `repo` scope for private repositories). |
-| `GITHUB_USERNAME` | Your GitHub username. |
 | `BACKUP_DIR` | Local directory where mirror repositories will be stored. |
 
 ## License

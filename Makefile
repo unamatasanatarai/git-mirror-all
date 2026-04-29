@@ -3,8 +3,8 @@ SHELL := /usr/bin/env bash
 
 .PHONY: help setup backup check all
 
-backup: check ## Run the backup script (pass DIR, USER, TOKEN as needed)
-	./make.sh "$(DIR)" "$(USER)" "$(TOKEN)"
+backup: check ## Run the backup script (pass DIR, TOKEN as needed)
+	./make.sh "$(DIR)" "$(TOKEN)"
 
 setup: ## Create .env file from .env.example
 	@if [ ! -f .env ]; then \
@@ -32,5 +32,4 @@ help: ## Show this help message
 	@echo ""
 	@echo "Variables:"
 	@echo "  DIR    - Backup directory (default: current)"
-	@echo "  USER   - GitHub username"
 	@echo "  TOKEN  - GitHub personal access token"
