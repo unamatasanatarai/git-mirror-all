@@ -1,12 +1,12 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := backup
 
-.PHONY: help setup backup check all
+.PHONY: help setup backup check
 
-backup: check ## Run the backup script (pass DIR, TOKEN as needed)
-	./make.sh "$(DIR)" "$(TOKEN)"
+backup: ## Run the backup script
+	./make.sh
 
-setup: ## Create .env file from .env.example
+setup: check ## Create .env file from .env.example
 	@if [ ! -f .env ]; then \
 		cp .env.example .env; \
 		echo "Created .env from .env.example. Please edit it with your credentials."; \
@@ -25,11 +25,4 @@ check: ## Check if required tools (curl, jq, git) are installed
 
 
 help: ## Show this help message
-	@echo "Usage: make [target] [variables]"
-	@echo ""
-	@echo "Targets:"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
-	@echo ""
-	@echo "Variables:"
-	@echo "  DIR    - Backup directory (default: current)"
-	@echo "  TOKEN  - GitHub personal access token"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
