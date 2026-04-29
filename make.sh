@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+if [[ -f .env ]]; then
+  set -a
+  source .env
+  set +a
+fi
+
+# Override variables with positional arguments if provided
+# Usage: ./make.sh [BACKUP_DIR] [GITHUB_USERNAME] [GITHUB_TOKEN]
+BACKUP_DIR="${1:-${BACKUP_DIR:-.}}"
+GITHUB_USERNAME="${2:-$GITHUB_USERNAME}"
+GITHUB_TOKEN="${3:-$GITHUB_TOKEN}"
+
+# Ensure required variables are set
+if [[ -z "$GITHUB_USERNAME" || -z "$GITHUB_TOKEN" ]]; then
+  echo "Error: GITHUB_USERNAME and GITHUB_TOKEN are required."
+  echo "Usage: $0 [BACKUP_DIR] [GITHUB_USERNAME] [GITHUB_TOKEN]"
+  echo "Alternatively, set them in the .env file."
+  exit 1
+fi
+
+# Create backup directory if it doesn't exist
+mkdir -p "$BACKUP_DIR"
+
+page=1
+
+while :; do
+  echo "--- Fetching page $page for $GITHUB_USERNAME ---"
+
+  repos=$(curl -s -L --connect-timeout 10 --max-time 30 \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    -H "X-GitHub-Api-Version: 2026-03-10" \
+    "https://api.github.com/user/repos?per_page=100&page=$page")
+
+
+  # ---- SAFETY CHECK ----
+  if ! jq -e 'type == "array"' <<<"$repos" > /dev/null; then
+    echo "GitHub API error:"
+    echo "$repos" | jq
+    exit 1
+  fi
+
+  count=$(jq 'length' <<<"$repos")
+  (( count == 0 )) && break
+
+  echo "Found $count repositories on this page."
+
+  while IFS= read -r repo; do
+    name=${repo##*/}
+    name=${name%.git}
+
+    dir="$BACKUP_DIR/$name.git"
+
+    if [[ -d "$dir" ]]; then
+      echo "[Update] $name"
+      git -C "$dir" remote update --prune
+    else
+      echo "[Clone]  $name"
+      git clone --mirror "$repo" "$dir"
+    fi
+  done < <(jq -r '.[].ssh_url' <<<"$repos")
+
+  ((page++))
+done
+
+echo "Success: Backup complete."
