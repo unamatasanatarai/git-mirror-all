@@ -60,12 +60,15 @@ You can set up the project using the provided `Makefile` or manually.
 #### Option A: Using Make (Quickest)
 ```bash
 make setup
+# Edit .env and provide your GITHUB_TOKEN and BACKUP_DIR
+# You can generate a token at: https://github.com/settings/tokens (requires 'repo' scope)
 ```
 
 #### Option B: Manual Setup
 ```bash
 cp .env.example .env
 # Edit .env and provide your GITHUB_TOKEN and BACKUP_DIR
+# You can generate a token at: https://github.com/settings/tokens (requires 'repo' scope)
 ```
 
 ## Usage
@@ -104,7 +107,7 @@ This will create a standard Git repository with a working directory from your lo
 
 | Variable | Description |
 | :--- | :--- |
-| `GITHUB_TOKEN` | GitHub Personal Access Token (requires `repo` scope for private repositories). |
+| `GITHUB_TOKEN` | GitHub Personal Access Token. Generate one at [github.com/settings/tokens](https://github.com/settings/tokens) (requires `repo` scope for private repositories). |
 | `BACKUP_DIR` | Local directory where mirror repositories will be stored. |
 
 ## License
