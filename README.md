@@ -1,115 +1,93 @@
-# git-mirror-all
+# Git Mirror All
 
-![GitHub](https://img.shields.io/badge/GitHub-API-blue?logo=github)
-![Bash](https://img.shields.io/badge/Script-Bash-4EAA25?logo=gnu-bash&logoColor=white)
-![Git](https://img.shields.io/badge/Tool-Git-F05032?logo=git&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Bash](https://img.shields.io/badge/Language-Bash-4EAA25?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![Git](https://img.shields.io/badge/Version%20Control-Git-F05032?logo=git&logoColor=white)](https://git-scm.com/)
+[![GitHub API](https://img.shields.io/badge/API-GitHub-181717?logo=github&logoColor=white)](https://docs.github.com/en/rest)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![cURL](https://img.shields.io/badge/Tools-cURL-073551?logo=curl&logoColor=white)](https://curl.se/)
+[![jq](https://img.shields.io/badge/Tools-jq-ace?logo=json&logoColor=white)](https://stedolan.github.io/jq/)
 
-An automated GitHub repository backup tool that mirrors all repositories from a user account to a local filesystem. It ensures complete off-site backups by maintaining full git mirrors, including all branches, tags, and commit history.
-
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Restoring from Backup](#restoring-from-backup)
-- [Configuration](#configuration)
-- [License](#license)
+A robust Bash utility designed to automate the mirroring and backup of all GitHub repositories associated with a user account. It ensures local copies are synchronized with remote changes using high-performance Git mirror protocols.
 
 ## Features
 
-- **Automated Mirroring**: Uses `git clone --mirror` to capture all repository data and references.
-- **Incremental Updates**: Updates existing backups using `git remote update --prune` to synchronize changes and remove deleted remote branches.
-- **API Pagination**: Handles large accounts by iterating through paginated GitHub API results (100 repos per page).
-- **Flexible Configuration**: Supports credentials via `.env` files, environment variables, or command-line arguments.
-- **Cross-Platform**: Works on any Unix-like system (macOS, Linux) with bash and git.
+- **Automated Discovery**: Fetches all user repositories via the GitHub REST API with full pagination support.
+- **Incremental Updates**: Uses `git remote update --prune` for existing mirrors to minimize bandwidth and time.
+- **Mirror Cloning**: Creates full Git mirrors using `--mirror` to preserve all branches, tags, and refs.
+- **Environment Driven**: Seamlessly integrates with `.env` files for secure credential management.
+- **Tooling Validation**: Built-in dependency checking to ensure all required binaries are available.
 
 ## Tech Stack
 
-- **Scripting**: Bash
-- **Data Processing**: jq
-- **Network**: Curl
-- **Version Control**: Git
-- **Task Runner**: Make (Optional)
-- **API**: GitHub REST API
-
+- **Scripting**: Pure Bash
+- **Data Processing**: `jq` for JSON manipulation
+- **Network**: `curl` for API communication
+- **Version Control**: `git` for repository synchronization
+- **Automation**: `make` for workflow orchestration
 
 ## Project Structure
 
-- `git-mirror-all`: The core shell script containing logic for API interaction and repository synchronization.
-- `Makefile`: A professional wrapper for managing dependencies, configuration, and execution.
+- `git-mirror-all`: The primary execution script for fetching and syncing repositories.
+- `Makefile`: Provides high-level commands for setup, dependency checking, and execution.
 - `.env.example`: Template for environment configuration.
-- `.gitignore`: Configured to exclude system files, local backups, and sensitive credentials.
-- `LICENSE`: MIT License.
+- `LICENSE`: MIT License documentation.
 
 ## Installation
 
-### Prerequisites
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/unamatasanatarai/git-mirror-all.git
+   cd git-mirror-all
+   ```
 
-Ensure the following tools are installed on your system:
-- `git`
-- `curl`
-- `jq`
+2. **Initialize configuration**:
+   ```bash
+   make setup
+   ```
 
-### Setup
-
-You can set up the project using the provided `Makefile` or manually.
-
-#### Option A: Using Make (Quickest)
-```bash
-make setup
-# Edit .env and provide your GITHUB_TOKEN and BACKUP_DIR
-# You can generate a token at: https://github.com/settings/tokens (requires 'repo' scope)
-```
-
-#### Option B: Manual Setup
-```bash
-cp .env.example .env
-# Edit .env and provide your GITHUB_TOKEN and BACKUP_DIR
-# You can generate a token at: https://github.com/settings/tokens (requires 'repo' scope)
-```
+3. **Configure credentials**:
+   Edit the generated `.env` file and provide your GitHub Personal Access Token:
+   ```bash
+   GITHUB_TOKEN="your_personal_access_token"
+   BACKUP_DIR="git-backup"
+   ```
 
 ## Usage
 
-The project is designed to be flexible. You can use `make` for convenience or call the script directly.
+### Generate a token
 
-### 1. Using Make
-Run the backup process with settings from `.env`:
+You can generate a token at: https://github.com/settings/tokens (requires 'repo' scope).
+
+### Using Make (Recommended)
+
+Run the full backup process with a single command:
 ```bash
 make backup
 ```
 
-### 2. Direct Execution (Make-free)
-Pass variables via positional arguments:
+### Direct Execution
+
+You can also run the script directly with optional positional arguments:
 ```bash
 ./git-mirror-all [BACKUP_DIR] [GITHUB_TOKEN]
 ```
-Example:
-```bash
-./git-mirror-all "./backups" "ghp_your_token_here"
-```
-
-
-## Restoring from Backup
-
-The backed-up repositories are stored as **Git mirrors** (bare repositories). To use a backed-up repository as a working directory, you should clone it from its local path.
-
-### How to use a local mirror:
-```bash
-git clone /path/to/backup/repo_name.git
-```
-This will create a standard Git repository with a working directory from your local mirror.
-
 
 ## Configuration
 
-| Variable | Description |
-| :--- | :--- |
-| `GITHUB_TOKEN` | GitHub Personal Access Token. Generate one at [github.com/settings/tokens](https://github.com/settings/tokens) (requires `repo` scope for private repositories). |
-| `BACKUP_DIR` | Local directory where mirror repositories will be stored. |
+The utility looks for a `.env` file in the root directory. The following variables are supported:
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `GITHUB_TOKEN` | Your GitHub Personal Access Token (Required) | None |
+| `BACKUP_DIR` | Local directory where repositories will be mirrored | `.` |
+
+## Tests
+
+Verify that your environment has all necessary dependencies installed:
+```bash
+make check
+```
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
