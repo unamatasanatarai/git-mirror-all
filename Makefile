@@ -1,18 +1,12 @@
 SHELL := /usr/bin/env bash
-.DEFAULT_GOAL := backup
+.DEFAULT_GOAL := help
 
-.PHONY: help setup backup check
+.PHONY: help backup check
 
-backup: ## Run the backup script
-	./git-mirror-all
+DIR ?= git-backup
 
-setup: check ## Create .env file from .env.example
-	@if [ ! -f .env ]; then \
-		cp .env.example .env; \
-		echo "Created .env from .env.example. Please edit it with your credentials."; \
-	else \
-		echo ".env already exists."; \
-	fi
+backup: check ## Run the backup script (usage: make backup DIR=path)
+	./git-mirror-all "$(DIR)"
 
 check: ## Check if required tools (curl, jq, git) are installed
 	@for tool in curl jq git; do \
@@ -22,7 +16,6 @@ check: ## Check if required tools (curl, jq, git) are installed
 		fi; \
 	done
 	@echo "All dependencies found."
-
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'

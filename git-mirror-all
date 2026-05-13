@@ -1,66 +1,82 @@
 #!/usr/bin/env bash
 
-if [[ -f .env ]]; then
-    set -a
-    source .env
-    set +a
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/git-mirror-all"
+config_file="$config_dir/config"
+
+if [[ -f "$config_file" ]]; then
+	set -a
+	# shellcheck source=/dev/null
+	source "$config_file"
+	set +a
 fi
 
-# Override variables with positional arguments if provided
-# Usage: ./git-mirror-all [BACKUP_DIR] [GITHUB_TOKEN]
-BACKUP_DIR="${1:-${BACKUP_DIR:-.}}"
-GITHUB_TOKEN="${2:-$GITHUB_TOKEN}"
-
-# Ensure required variables are set
-if [[ -z "$GITHUB_TOKEN" ]]; then
-    echo "Error: GITHUB_TOKEN is required."
-    echo "Usage: $0 [BACKUP_DIR] [GITHUB_TOKEN]"
-    echo "Alternatively, set it in the .env file."
-    exit 1
+if [[ -z "$1" ]]; then
+	echo "Error: BACKUP_DIR is required."
+	echo "Usage: $0 <BACKUP_DIR> [GITHUB_TOKEN]"
+	exit 1
 fi
 
-# Create backup directory if it doesn't exist
-mkdir -p "$BACKUP_DIR"
+backup_dir="$1"
+github_token="${2:-$GITHUB_TOKEN}"
+
+if [[ -z "$github_token" ]]; then
+	echo "GitHub Personal Access Token not found."
+	echo "You can create one at: https://github.com/settings/tokens"
+	echo "Note: The token needs 'repo' scope."
+	echo
+	read -rp "Enter your GitHub Token: " github_token
+
+	if [[ -n "$github_token" ]]; then
+		mkdir -p "$config_dir"
+		echo "GITHUB_TOKEN=\"$github_token\"" >>"$config_file"
+		chmod 600 "$config_file"
+		echo "Token saved to $config_file"
+	else
+		echo "Error: GITHUB_TOKEN is required to proceed."
+		exit 1
+	fi
+fi
+
+mkdir -p "$backup_dir"
 
 page=1
 
 while :; do
-    echo "--- Fetching page $page ---"
+	echo "--- Fetching page $page ---"
 
-    repos=$(curl -s -L --connect-timeout 10 --max-time 30 \
-        -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer $GITHUB_TOKEN" \
-        -H "X-GitHub-Api-Version: 2026-03-10" \
-        "https://api.github.com/user/repos?per_page=100&page=$page")
+	repos=$(curl -s -L --connect-timeout 10 --max-time 30 \
+		-H "Accept: application/vnd.github+json" \
+		-H "Authorization: Bearer $github_token" \
+		-H "X-GitHub-Api-Version: 2026-03-10" \
+		"https://api.github.com/user/repos?per_page=100&page=$page")
 
-    # ---- SAFETY CHECK ----
-    if ! jq -e 'type == "array"' <<<"$repos" >/dev/null; then
-        echo "GitHub API error:"
-        echo "$repos" | jq
-        exit 1
-    fi
+	if ! jq -e 'type == "array"' <<<"$repos" >/dev/null; then
+		echo "GitHub API error:"
+		echo "$repos" | jq
+		exit 1
+	fi
 
-    count=$(jq 'length' <<<"$repos")
-    ((count == 0)) && break
+	count=$(jq 'length' <<<"$repos")
+	((count == 0)) && break
 
-    echo "Found $count repositories on this page."
+	echo "Found $count repositories on this page."
 
-    while IFS= read -r repo; do
-        name=${repo##*/}
-        name=${name%.git}
+	while IFS= read -r repo; do
+		name=${repo##*/}
+		name=${name%.git}
 
-        dir="$BACKUP_DIR/$name.git"
+		dir="$backup_dir/$name.git"
 
-        if [[ -d "$dir" ]]; then
-            echo "[Update] $name"
-            git -C "$dir" remote update --prune
-        else
-            echo "[Clone]  $name"
-            git clone --mirror "$repo" "$dir"
-        fi
-    done < <(jq -r '.[].ssh_url' <<<"$repos")
+		if [[ -d "$dir" ]]; then
+			echo "[Update] $name"
+			git -C "$dir" remote update --prune
+		else
+			echo "[Clone]  $name"
+			git clone --mirror "$repo" "$dir"
+		fi
+	done < <(jq -r '.[].ssh_url' <<<"$repos")
 
-    ((page++))
+	((page++))
 done
 
 echo "Success: Backup complete."

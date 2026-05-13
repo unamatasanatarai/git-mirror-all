@@ -14,7 +14,8 @@ A robust Bash utility designed to automate the mirroring and backup of all GitHu
 - **Automated Discovery**: Fetches all user repositories via the GitHub REST API with full pagination support.
 - **Incremental Updates**: Uses `git remote update --prune` for existing mirrors to minimize bandwidth and time.
 - **Mirror Cloning**: Creates full Git mirrors using `--mirror` to preserve all branches, tags, and refs.
-- **Environment Driven**: Seamlessly integrates with `.env` files for secure credential management.
+- **XDG Compliance**: Securely stores configuration in standard XDG locations.
+- **Interactive Setup**: Automatically prompts for and saves your GitHub token if not configured.
 - **Tooling Validation**: Built-in dependency checking to ensure all required binaries are available.
 
 ## Tech Stack
@@ -28,8 +29,7 @@ A robust Bash utility designed to automate the mirroring and backup of all GitHu
 ## Project Structure
 
 - `git-mirror-all`: The primary execution script for fetching and syncing repositories.
-- `Makefile`: Provides high-level commands for setup, dependency checking, and execution.
-- `.env.example`: Template for environment configuration.
+- `Makefile`: Provides high-level commands for backup, dependency checking, and help.
 - `LICENSE`: MIT License documentation.
 
 ## Installation
@@ -40,46 +40,42 @@ A robust Bash utility designed to automate the mirroring and backup of all GitHu
    cd git-mirror-all
    ```
 
-2. **Initialize configuration**:
+2. **Verify dependencies**:
    ```bash
-   make setup
-   ```
-
-3. **Configure credentials**:
-   Edit the generated `.env` file and provide your GitHub Personal Access Token:
-   ```bash
-   GITHUB_TOKEN="your_personal_access_token"
-   BACKUP_DIR="git-backup"
+   make check
    ```
 
 ## Usage
 
-### Generate a token
-
-You can generate a token at: https://github.com/settings/tokens (requires 'repo' scope).
-
 ### Using Make (Recommended)
 
-Run the full backup process with a single command:
+Run the full backup process by specifying a target directory:
 ```bash
-make backup
+make backup DIR=my-backups
 ```
+*If `DIR` is omitted, it defaults to `git-backup`.*
 
 ### Direct Execution
 
-You can also run the script directly with optional positional arguments:
+Run the script directly with the mandatory `BACKUP_DIR` argument:
 ```bash
-./git-mirror-all [BACKUP_DIR] [GITHUB_TOKEN]
+./git-mirror-all <BACKUP_DIR> [GITHUB_TOKEN]
 ```
+
+### Interactive Token Setup
+
+On the first run, if a token is not found in the environment or config file, the script will:
+1. Display information on how to generate a token at [GitHub Settings](https://github.com/settings/tokens).
+2. Prompt you to enter your token.
+3. Save it securely to `~/.config/git-backup/config`.
 
 ## Configuration
 
-The utility looks for a `.env` file in the root directory. The following variables are supported:
+The utility uses the standard XDG config location: `~/.config/git-backup/config` (or `$XDG_CONFIG_HOME/git-backup/config`).
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `GITHUB_TOKEN` | Your GitHub Personal Access Token (Required) | None |
-| `BACKUP_DIR` | Local directory where repositories will be mirrored | `.` |
+| Variable | Description |
+| :--- | :--- |
+| `GITHUB_TOKEN` | Your GitHub Personal Access Token (Required) |
 
 ## Tests
 
@@ -91,3 +87,4 @@ make check
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
