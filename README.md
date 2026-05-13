@@ -51,9 +51,9 @@ A robust Bash utility designed to automate the mirroring and backup of all GitHu
 
 Run the full backup process by specifying a target directory:
 ```bash
-make backup DIR=my-backups
+make DIR=my-backups
 ```
-*If `DIR` is omitted, it defaults to `git-backup`.*
+*If `DIR` is omitted, it defaults to `${HOME}/git-backups`.*
 
 ### Direct Execution
 
@@ -67,11 +67,11 @@ Run the script directly with the mandatory `BACKUP_DIR` argument:
 On the first run, if a token is not found in the environment or config file, the script will:
 1. Display information on how to generate a token at [GitHub Settings](https://github.com/settings/tokens).
 2. Prompt you to enter your token.
-3. Save it securely to `~/.config/git-backup/config`.
+3. Save it securely to `~/.local/share/git-mirror-all/config`.
 
 ## Configuration
 
-The utility uses the standard XDG config location: `~/.config/git-backup/config` (or `$XDG_CONFIG_HOME/git-backup/config`).
+The utility uses the standard XDG data location: `~/.local/share/git-mirror-all/config` (or `$XDG_DATA_HOME/git-mirror-all/config`).
 
 | Variable | Description |
 | :--- | :--- |

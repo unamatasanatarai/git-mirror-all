@@ -1,9 +1,9 @@
 SHELL := /usr/bin/env bash
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := backup
 
 .PHONY: help backup check
 
-DIR ?= git-backup
+DIR ?= ${HOME}/git-backups
 
 backup: check ## Run the backup script (usage: make backup DIR=path)
 	./git-mirror-all "$(DIR)"
