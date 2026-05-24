@@ -24,7 +24,7 @@ if [[ -z "$github_token" ]]; then
     echo "You can create one at: https://github.com/settings/tokens"
     echo "Note: The token needs 'repo' scope."
     echo
-    read -rp "Enter your GitHub Token: " github_token
+    read -rsp "Enter your GitHub Token: " github_token
 
     if [[ -n "$github_token" ]]; then
         mkdir -p "$config_dir"
