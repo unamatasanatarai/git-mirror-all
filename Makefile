@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 
 .PHONY: help backup check
 
-DIR ?= ${HOME}/git-backups
+DIR ?= ${HOME}/__backups/git
 
 backup: check ## Run the backup script (usage: make backup DIR=path)
 	./git-mirror-all "$(DIR)"
